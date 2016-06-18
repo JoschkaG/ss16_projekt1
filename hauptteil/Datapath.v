@@ -31,7 +31,7 @@ module Datapath(
 	// (b) Führe Berechnung in der ALU durch
 	ArithmeticLogicUnit alu(srca, srcbimm, alucontrol, aluout, zero);
 	// (c) Wähle richtiges Ergebnis aus
-	assign result = memtoreg ? readdata : lui ? (instr[15:0]<<16) : aluout;
+	assign result = memtoreg ? readdata : (lui ? (instr[15:0]<<16) : aluout);
 
 	// Memory: Datenwort das zur (möglichen) Speicherung an den Datenspeicher übertragen wird
 	assign writedata = srcb;
@@ -146,7 +146,7 @@ begin
 				r = a < b;
 				end
 	endcase
-	if(~r) 
+	if(r==0) 
 	begin
 	z = 1;	
 	end

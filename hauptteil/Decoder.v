@@ -66,6 +66,19 @@ module Decoder(
 					ori = 0;
 					alucontrol = 'b110; // TODO // Subtraktion
 				end
+			6'b000101: // Branch Not Equal
+				begin
+					regwrite = 0;
+					destreg = 5'bx;
+					alusrcbimm = 0;
+					dobranch = ~zero; // Gleichheitstest
+					memwrite = 0;
+					memtoreg = 0;
+					dojump = 0;
+					lui = 0;
+					ori = 0;
+					alucontrol = 'b110; // TODO // Subtraktion
+				end
 			6'b001001: // Addition immediate unsigned
 				begin
 					regwrite = 1;
