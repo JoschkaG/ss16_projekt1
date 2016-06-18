@@ -116,6 +116,9 @@ module ArithmeticLogicUnit(
 	output        zero
 );
 
-	// TODO Implementierung der ALU
+always @
+begin
+	case ()
+end
 
 endmodule

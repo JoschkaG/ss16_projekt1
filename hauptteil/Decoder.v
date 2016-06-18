@@ -27,12 +27,12 @@ module Decoder(
 					memtoreg = 0;
 					dojump = 0;
 					case (funct)
-						6'b100001: alucontrol = // TODO // Addition unsigned
-						6'b100011: alucontrol = // TODO // Subtraktion unsigned
-						6'b100100: alucontrol = // TODO // and
-						6'b100101: alucontrol = // TODO // or
-						6'b101011: alucontrol = // TODO // set-less-than unsigned
-						default:   alucontrol = // TODO // undefiniert
+						6'b100001: alucontrol = 'b010;
+						6'b100011: alucontrol = 'b110;
+						6'b100100: alucontrol = 'b000;
+						6'b100101: alucontrol = 'b001;
+						6'b101011: alucontrol = 'b111;
+						default:   alucontrol = 'bxxx;
 					endcase
 				end
 			6'b100011, // Lade Datenwort aus Speicher
@@ -45,7 +45,7 @@ module Decoder(
 					memwrite = op[3];
 					memtoreg = 1;
 					dojump = 0;
-					alucontrol = // TODO // Addition effektive Adresse: Basisregister + Offset
+					alucontrol = 'b010;    // TODO // Addition effektive Adresse: Basisregister + Offset
 				end
 			6'b000100: // Branch Equal
 				begin
@@ -56,7 +56,7 @@ module Decoder(
 					memwrite = 0;
 					memtoreg = 0;
 					dojump = 0;
-					alucontrol = // TODO // Subtraktion
+					alucontrol = 'b110; // TODO // Subtraktion
 				end
 			6'b001001: // Addition immediate unsigned
 				begin
@@ -67,7 +67,7 @@ module Decoder(
 					memwrite = 0;
 					memtoreg = 0;
 					dojump = 0;
-					alucontrol = // TODO // Addition
+					alucontrol = 'b010; // TODO // Addition
 				end
 			6'b000010: // Jump immediate
 				begin
@@ -78,7 +78,7 @@ module Decoder(
 					memwrite = 0;
 					memtoreg = 0;
 					dojump = 1;
-					alucontrol = // TODO
+					alucontrol = 'bxxx // TODO
 				end
 			default: // Default Fall
 				begin
@@ -89,7 +89,7 @@ module Decoder(
 					memwrite = 1'bx;
 					memtoreg = 1'bx;
 					dojump = 1'bx;
-					alucontrol = // TODO
+					alucontrol = 'bxxx;// TODO
 				end
 		endcase
 	end
