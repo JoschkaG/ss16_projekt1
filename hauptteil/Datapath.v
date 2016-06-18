@@ -7,6 +7,8 @@ module Datapath(
 	input         regwrite,
 	input         jump,
 	input  [2:0]  alucontrol,
+	input		  lui,
+	input		  ori,
 	output        zero,
 	output [31:0] pc,
 	input  [31:0] instr,
@@ -24,12 +26,12 @@ module Datapath(
 
 	// Execute:
 	// (a) Wähle Operanden aus
-	SignExtension se(instr[15:0], signimm);
+	SignExtension se(instr[15:0],ori, signimm);
 	assign srcbimm = alusrcbimm ? signimm : srcb;
 	// (b) Führe Berechnung in der ALU durch
 	ArithmeticLogicUnit alu(srca, srcbimm, alucontrol, aluout, zero);
 	// (c) Wähle richtiges Ergebnis aus
-	assign result = memtoreg ? readdata : aluout;
+	assign result = memtoreg ? readdata : lui ? (instr[15:0]<<16) : aluout;
 
 	// Memory: Datenwort das zur (möglichen) Speicherung an den Datenspeicher übertragen wird
 	assign writedata = srcb;
@@ -104,9 +106,10 @@ endmodule
 
 module SignExtension(
 	input  [15:0] a,
+	input 		  o,
 	output [31:0] y
 );
-	assign y = {{16{a[15]}}, a};
+	assign y = o ? {16'b0, a} : {{16{a[15]}}, a};
 endmodule
 
 module ArithmeticLogicUnit(
@@ -116,9 +119,43 @@ module ArithmeticLogicUnit(
 	output        zero
 );
 
-always @
+reg [31:0] r;
+reg z;
+
+always @*
 begin
-	case ()
+	case (alucontrol)
+			3'b000: 
+				begin
+				r = a & b;
+				end
+			3'b001: 
+				begin
+				r = a | b;
+				end
+			3'b010:
+				begin
+				r = a + b;
+				end
+			3'b110:
+				begin
+				r = a - b;
+				end
+			3'b111:
+				begin
+				r = a < b;
+				end
+	endcase
+	if(~r) 
+	begin
+	z = 1;	
+	end
+	else begin
+	z = 0;
+	end
 end
+
+assign result = r ;
+assign zero = z;
 
 endmodule

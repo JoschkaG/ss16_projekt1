@@ -8,7 +8,9 @@ module Decoder(
 	output reg [4:0] destreg,    // Nummer des (möglicherweise) zu schreibenden Zielregisters
 	output reg       regwrite,   // Schreibe ein Zielregister
 	output reg       dojump,     // Führe einen absoluten Sprung aus
-	output reg [2:0] alucontrol  // ALU-Kontroll-Bits
+	output reg [2:0] alucontrol,  // ALU-Kontroll-Bits
+	output reg 		 lui,
+	output reg 		 ori
 );
 	// Extrahiere primären und sekundären Operationcode
 	wire [5:0] op = instr[31:26];
@@ -26,6 +28,8 @@ module Decoder(
 					memwrite = 0;
 					memtoreg = 0;
 					dojump = 0;
+					lui = 0;
+					ori = 0;
 					case (funct)
 						6'b100001: alucontrol = 'b010;
 						6'b100011: alucontrol = 'b110;
@@ -45,6 +49,8 @@ module Decoder(
 					memwrite = op[3];
 					memtoreg = 1;
 					dojump = 0;
+					lui = 0;
+					ori = 0;
 					alucontrol = 'b010;    // TODO // Addition effektive Adresse: Basisregister + Offset
 				end
 			6'b000100: // Branch Equal
@@ -56,6 +62,8 @@ module Decoder(
 					memwrite = 0;
 					memtoreg = 0;
 					dojump = 0;
+					lui = 0;
+					ori = 0;
 					alucontrol = 'b110; // TODO // Subtraktion
 				end
 			6'b001001: // Addition immediate unsigned
@@ -67,6 +75,8 @@ module Decoder(
 					memwrite = 0;
 					memtoreg = 0;
 					dojump = 0;
+					lui = 0;
+					ori = 0;
 					alucontrol = 'b010; // TODO // Addition
 				end
 			6'b000010: // Jump immediate
@@ -78,7 +88,9 @@ module Decoder(
 					memwrite = 0;
 					memtoreg = 0;
 					dojump = 1;
-					alucontrol = 'bxxx // TODO
+					lui = 0;
+					ori = 0;
+					alucontrol = 'bxxx; // TODO
 				end
 			default: // Default Fall
 				begin
@@ -89,7 +101,35 @@ module Decoder(
 					memwrite = 1'bx;
 					memtoreg = 1'bx;
 					dojump = 1'bx;
+					lui = 1'bx;
+					ori = 1'bx;
 					alucontrol = 'bxxx;// TODO
+				end
+			6'b001111: // Lui
+				begin
+					regwrite = 1;
+					destreg = instr[20:16];
+					alusrcbimm = 0;
+					dobranch = 0;
+					memwrite = 0;
+					memtoreg = 0;
+					dojump = 0;
+					lui = 1;
+					ori = 0;
+					alucontrol = 'bxxx;
+				end
+			6'b001101: // ori
+				begin
+					regwrite = 1;
+					destreg = instr[20:16];
+					alusrcbimm = 1;
+					dobranch = 0;
+					memwrite = 0;
+					memtoreg = 0;
+					dojump = 0;
+					lui = 0;
+					ori = 1;
+					alucontrol = 'b001;
 				end
 		endcase
 	end
