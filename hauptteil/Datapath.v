@@ -7,6 +7,7 @@ module Datapath(
 	input         regwrite,
 	input         jump,
 	input  [2:0]  alucontrol,
+	input  [1:0]  multcont,
 	input		  lui,
 	input		  ori,
 	output        zero,
@@ -29,7 +30,7 @@ module Datapath(
 	SignExtension se(instr[15:0],ori, signimm);
 	assign srcbimm = alusrcbimm ? signimm : srcb;
 	// (b) Führe Berechnung in der ALU durch
-	ArithmeticLogicUnit alu(srca, srcbimm, alucontrol, aluout, zero);
+	ArithmeticLogicUnit alu(srca, srcbimm, alucontrol, multcont, aluout, zero);
 	// (c) Wähle richtiges Ergebnis aus
 	assign result = memtoreg ? readdata : (lui ? (instr[15:0]<<16) : aluout);
 
@@ -115,11 +116,12 @@ endmodule
 module ArithmeticLogicUnit(
 	input  [31:0] a, b,
 	input  [2:0]  alucontrol,
+	input  [1:0]  multcont,
 	output [31:0] result,
 	output        zero
 );
 
-reg [31:0] r;
+reg [31:0] r,hi,lo;
 reg z;
 
 always @*
@@ -141,10 +143,22 @@ begin
 				begin
 				r = a - b;
 				end
+			3'b011:
+				begin
+				{hi,lo} = a*b;		
+				end	
 			3'b111:
 				begin
 				r = a < b;
 				end
+	endcase
+	case(multcont)
+			2'b01:
+				r = hi;
+			2'b10:
+				r = lo;
+			2'b00:
+				r = r;
 	endcase
 	if(r==0) 
 	begin

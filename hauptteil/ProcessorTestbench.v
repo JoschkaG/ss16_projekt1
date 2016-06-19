@@ -16,8 +16,8 @@ module ProcessorTestbench();
 			//$readmemh("TestProgramme/Fibonacci.dat", proc.imem.INSTRROM, 0, 5);
 			//$readmemh("TestProgramme/Funktionsaufruf.dat", proc.imem.INSTRROM, 0, 4);
 			//$readmemh("TestProgramme/Konstanten.dat", proc.imem.INSTRROM, 0, 2);
-			//$readmemh("TestProgramme/Multiplikation.dat", proc.imem.INSTRROM, 0, 4);
-			$readmemh("TestProgramme/Test_sltu_bne.dat", proc.imem.INSTRROM, 0, 6);
+			$readmemh("TestProgramme/Multiplikation.dat", proc.imem.INSTRROM, 0, 4);
+			//$readmemh("TestProgramme/Test_sltu_bne.dat", proc.imem.INSTRROM, 0, 6);
 
 			// Generiere reset-Eingabe
 			reset <= 1;
