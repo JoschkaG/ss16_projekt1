@@ -8,6 +8,7 @@ module Decoder(
 	output reg [4:0] destreg,    // Nummer des (möglicherweise) zu schreibenden Zielregisters
 	output reg       regwrite,   // Schreibe ein Zielregister
 	output reg       dojump,     // Führe einen absoluten Sprung aus
+	output reg 		 dojumpreg,  // Jump zu Register
 	output reg [2:0] alucontrol,  // ALU-Kontroll-Bits
 	output reg [1:0] multcont,	 //Control Bits für MultHi und MultLo
 	output reg 		 lui,		 //Load Control
@@ -29,6 +30,7 @@ module Decoder(
 					memwrite = 0;
 					memtoreg = 0;
 					dojump = 0;
+					dojumpreg = 0;
 					lui = 0;
 					ori = 0;
 					multcont = 'b00;
@@ -49,6 +51,11 @@ module Decoder(
 						6'b100100: alucontrol = 'b000; //Logisches Und
 						6'b100101: alucontrol = 'b001; //Logisches Oder
 						6'b101011: alucontrol = 'b111; //Less than
+						6'b001000: 
+							begin
+							alucontrol = 'bxxx;
+							dojumpreg = 1;
+							end
 						default:   alucontrol = 'bxxx; //Undefined
 					endcase
 				end
@@ -62,6 +69,7 @@ module Decoder(
 					memwrite = op[3];
 					memtoreg = 1;
 					dojump = 0;
+					dojumpreg = 0;
 					lui = 0;
 					ori = 0;
 					multcont = 'b00;
@@ -76,6 +84,7 @@ module Decoder(
 					memwrite = 0;
 					memtoreg = 0;
 					dojump = 0;
+					dojumpreg = 0;
 					lui = 0;
 					ori = 0;
 					multcont = 'b00;
@@ -90,6 +99,7 @@ module Decoder(
 					memwrite = 0;
 					memtoreg = 0;
 					dojump = 0;
+					dojumpreg = 0;
 					lui = 0;
 					ori = 0;
 					multcont = 'b00;
@@ -104,6 +114,7 @@ module Decoder(
 					memwrite = 0;
 					memtoreg = 0;
 					dojump = 0;
+					dojumpreg = 0;
 					lui = 0;
 					ori = 0;
 					multcont = 'b00;
@@ -118,6 +129,22 @@ module Decoder(
 					memwrite = 0;
 					memtoreg = 0;
 					dojump = 1;
+					dojumpreg = 0;
+					lui = 0;
+					ori = 0;
+					multcont = 'b00;
+					alucontrol = 'bxxx; // TODO
+				end
+			6'b000011: // Jal
+				begin
+					regwrite = 1;
+					destreg = 31;
+					alusrcbimm = 0;
+					dobranch = 0;
+					memwrite = 0;
+					memtoreg = 0;
+					dojump = 1;
+					dojumpreg = 0;
 					lui = 0;
 					ori = 0;
 					multcont = 'b00;
@@ -132,6 +159,7 @@ module Decoder(
 					memwrite = 1'bx;
 					memtoreg = 1'bx;
 					dojump = 1'bx;
+					dojumpreg = 1'bx;
 					lui = 1'bx;
 					ori = 1'bx;
 					multcont = 2'bx;
@@ -146,6 +174,7 @@ module Decoder(
 					memwrite = 0;
 					memtoreg = 0;
 					dojump = 0;
+					dojumpreg = 0;
 					lui = 1;
 					ori = 0;
 					multcont = 'b00;
@@ -160,6 +189,7 @@ module Decoder(
 					memwrite = 0;
 					memtoreg = 0;
 					dojump = 0;
+					dojumpreg = 0;
 					lui = 0;
 					ori = 1;
 					multcont = 'b00;

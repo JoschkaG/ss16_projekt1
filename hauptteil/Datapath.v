@@ -6,6 +6,7 @@ module Datapath(
 	input  [4:0]  destreg,
 	input         regwrite,
 	input         jump,
+	input 		  dojumpreg,
 	input  [2:0]  alucontrol,
 	input  [1:0]  multcont,
 	input		  lui,
@@ -21,9 +22,10 @@ module Datapath(
 	wire [31:0] signimm;
 	wire [31:0] srca, srcb, srcbimm;
 	wire [31:0] result;
+	wire  [31:0] oldpc;
 
 	// Fetch: Reiche PC an Instruktionsspeicher weiter und update PC
-	ProgramCounter pcenv(clk, reset, dobranch, signimm, jump, instr[25:0], pc);
+	ProgramCounter pcenv(clk, reset, dobranch, signimm, jump, dojumpreg, srca, instr[25:0],oldpc, pc);
 
 	// Execute:
 	// (a) Wähle Operanden aus
@@ -32,7 +34,7 @@ module Datapath(
 	// (b) Führe Berechnung in der ALU durch
 	ArithmeticLogicUnit alu(srca, srcbimm, alucontrol, multcont, aluout, zero);
 	// (c) Wähle richtiges Ergebnis aus
-	assign result = memtoreg ? readdata : (lui ? (instr[15:0]<<16) : aluout);
+	assign result = memtoreg ? readdata : (lui ? (instr[15:0]<<16) : jump ? oldpc : aluout);
 
 	// Memory: Datenwort das zur (möglichen) Speicherung an den Datenspeicher übertragen wird
 	assign writedata = srcb;
@@ -48,7 +50,10 @@ module ProgramCounter(
 	input         dobranch,
 	input  [31:0] branchoffset,
 	input         dojump,
+	input		  dojumpreg,
+	input  [31:0] srca,
 	input  [25:0] jumptarget,
+	output [31:0] oldpc,
 	output [31:0] progcounter
 );
 	reg  [31:0] pc;
@@ -59,10 +64,11 @@ module ProgramCounter(
 	// Berechne mögliches (PC-relatives) Sprungziel
 	Adder pcbranch(.a(incpc), .b({branchoffset[29:0], 2'b00}), .cin(1'b0), .y(branchpc));
 	// Wähle den nächsten Wert des Befehlszählers aus
-	assign nextpc = dojump   ? {incpc[31:28], jumptarget, 2'b00} :
+	assign nextpc = dojumpreg ? srca :
+					dojump   ? {incpc[31:28], jumptarget, 2'b00} :
 	                dobranch ? branchpc :
 	                           incpc;
-
+	assign oldpc = dojump ? incpc : 0 ;
 	// Der Befehlszähler ist ein Speicherbaustein
 	always @(posedge clk)
 	begin
