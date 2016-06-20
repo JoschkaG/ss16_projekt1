@@ -10,7 +10,6 @@ module Decoder(
 	output reg       dojump,     // Führe einen absoluten Sprung aus
 	output reg 		 dojumpreg,  // Jump zu Register
 	output reg [2:0] alucontrol,  // ALU-Kontroll-Bits
-	output reg [1:0] multcont,	 //Control Bits für MultHi und MultLo
 	output reg 		 lui,		 //Load Control
 	output reg 		 ori 		 //Ori Control
 );
@@ -33,21 +32,12 @@ module Decoder(
 					dojumpreg = 0;
 					lui = 0;
 					ori = 0;
-					multcont = 'b00;
 					case (funct)
 						6'b100001: alucontrol = 'b010; //Addition
 						6'b100011: alucontrol = 'b110; //Subtraktion
 						6'b011001: alucontrol = 'b011; //Multiplikation
-						6'b010000:					   //MultHi
-							begin
-								alucontrol = 'bxxx;
-								multcont = 'b01;
-							end
-						6'b010010:					   //MultLo
-							begin
-								alucontrol = 'bxxx;
-								multcont = 'b10;
-							end
+						6'b010000: alucontrol = 'b101; //MultHi
+						6'b010010: alucontrol = 'b100; //MultLo
 						6'b100100: alucontrol = 'b000; //Logisches Und
 						6'b100101: alucontrol = 'b001; //Logisches Oder
 						6'b101011: alucontrol = 'b111; //Less than
@@ -72,7 +62,6 @@ module Decoder(
 					dojumpreg = 0;
 					lui = 0;
 					ori = 0;
-					multcont = 'b00;
 					alucontrol = 'b010;    // TODO // Addition effektive Adresse: Basisregister + Offset
 				end
 			6'b000100: // Branch Equal
@@ -87,7 +76,6 @@ module Decoder(
 					dojumpreg = 0;
 					lui = 0;
 					ori = 0;
-					multcont = 'b00;
 					alucontrol = 'b110; // TODO // Subtraktion
 				end
 			6'b000101: // Branch Not Equal
@@ -102,7 +90,6 @@ module Decoder(
 					dojumpreg = 0;
 					lui = 0;
 					ori = 0;
-					multcont = 'b00;
 					alucontrol = 'b110; // TODO // Subtraktion
 				end
 			6'b001001: // Addition immediate unsigned
@@ -117,7 +104,6 @@ module Decoder(
 					dojumpreg = 0;
 					lui = 0;
 					ori = 0;
-					multcont = 'b00;
 					alucontrol = 'b010; // TODO // Addition
 				end
 			6'b000010: // Jump immediate
@@ -132,7 +118,6 @@ module Decoder(
 					dojumpreg = 0;
 					lui = 0;
 					ori = 0;
-					multcont = 'b00;
 					alucontrol = 'bxxx; // TODO
 				end
 			6'b000011: // Jal
@@ -147,7 +132,6 @@ module Decoder(
 					dojumpreg = 0;
 					lui = 0;
 					ori = 0;
-					multcont = 'b00;
 					alucontrol = 'bxxx; // TODO
 				end
 			default: // Default Fall
@@ -162,7 +146,6 @@ module Decoder(
 					dojumpreg = 1'bx;
 					lui = 1'bx;
 					ori = 1'bx;
-					multcont = 2'bx;
 					alucontrol = 'bxxx;// TODO
 				end
 			6'b001111: // Lui
@@ -177,7 +160,6 @@ module Decoder(
 					dojumpreg = 0;
 					lui = 1;
 					ori = 0;
-					multcont = 'b00;
 					alucontrol = 'bxxx;
 				end
 			6'b001101: // ori
@@ -192,7 +174,6 @@ module Decoder(
 					dojumpreg = 0;
 					lui = 0;
 					ori = 1;
-					multcont = 'b00;
 					alucontrol = 'b001;
 				end
 		endcase
