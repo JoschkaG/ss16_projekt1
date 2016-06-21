@@ -4,21 +4,23 @@ module MealyPattern(
 	output  [1:0] o
 );
 
-reg p,q;
+reg p,q,r,s;
 
 
 initial begin
-	p = 0;
-	q = 0; 
+	p = 'b1;
+	q = 'b1;
+	r = 'b0;
+	s = 'b0;
 end
 
 
 		always @(posedge clock) begin
-			p <= i;
-			q <= p;
+			p <= i; r <= i;
+			q <= p; s <= r;
 		end
 		
-	assign o[1] = i & ~p & q;
+	assign o[1] = i & ~r & s;
 	assign o[0] = ~i & p & ~q;
 	
 endmodule
@@ -30,10 +32,6 @@ module MealyPatternTestbench();
 	initial begin
 		$dumpfile("Mealy.vcd");
 		$dumpvars;
-		in <= 1'b0;
-		#4
-		in <= 1'b1;
-		#4
 		in <= 1'b1;
 		#4
 		in <= 1'b0;
@@ -46,10 +44,23 @@ module MealyPatternTestbench();
 		#4
 		in <= 1'b0;
 		#4
-		in <= 1'b1;
+		/*
+		in <= 1'b0;
 		#4
 		in <= 1'b1;
 		#4
+		in <= 1'b0;
+		#4
+		in <= 1'b1;
+		#4
+		in <= 1'b0;
+		#4
+		in <= 1'b1;
+		#4
+		in <= 1'b1;
+		#4
+		*/
+
 		$finish;
 	end
 
