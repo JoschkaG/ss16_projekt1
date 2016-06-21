@@ -32,6 +32,11 @@ module MealyPatternTestbench();
 	initial begin
 		$dumpfile("Mealy.vcd");
 		$dumpvars;
+		//0110101011
+		in <= 1'b0;
+		#4
+		in <= 1'b1;
+		#4
 		in <= 1'b1;
 		#4
 		in <= 1'b0;
@@ -44,23 +49,10 @@ module MealyPatternTestbench();
 		#4
 		in <= 1'b0;
 		#4
-		/*
-		in <= 1'b0;
-		#4
-		in <= 1'b1;
-		#4
-		in <= 1'b0;
-		#4
-		in <= 1'b1;
-		#4
-		in <= 1'b0;
-		#4
 		in <= 1'b1;
 		#4
 		in <= 1'b1;
 		#4
-		*/
-
 		$finish;
 	end
 
@@ -74,13 +66,6 @@ module MealyPatternTestbench();
 
 	MealyPattern machine(.clock(clk), .i(in), .o(o));
 
-	reg [0:8] e;
-	reg [0:8] s [1:0];
-	reg [0:8] r;
-
-	initial begin
-		r = {9'b101001101};
-	end
 
 endmodule
 
